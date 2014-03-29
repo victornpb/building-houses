@@ -1,0 +1,14 @@
+.ga{
+        font-family: Consolas, Monospace;
+        font-size: 12px;
+}
+
+.ga *{
+    text-rendering: optimizeSpeed;
+    /* -webkit-font-smoothing: none;
+    font-smoothing: none; */
+}
+
+.ga li{
+    white-space: pre;
+}
