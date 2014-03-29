@@ -40,7 +40,10 @@ function simulate(){
         elapsed.innerHTML = timer.elapsed();
         
         running.checked = false;
+        enableUI = true;
     }
+    
+    enableUI = false;
     
     running.checked = true;
     timer.start();
