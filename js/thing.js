@@ -1,3 +1,5 @@
+var enableUI=true;
+
 var field;
 var plots;
 var houses;
@@ -36,69 +38,70 @@ function updatePlots() {
 			plot -= 1;
 		plots[plot] += 1;
 	});
-
-	// create the displays for each plot
-	var plot = field.select('.plots').selectAll('.plot')
-				.data(plots);
-
-	plot.enter()
-					.append('g')
-					.attr('class','plot')
-					.append('rect');
-	;
-	// size and position all the plots
-	plot
-		.attr('transform',function(d,i) {
-			return "translate("+(((904-plots.length*4)*plotWidth+4)*i+20)+",30)";
-		})
-	;
-	plot.select('rect')
-		.attr('width',function(d,i){return (904-plots.length*4)*plotWidth})
-		.attr('height',50);
-	;
-
-	// classify plots based on how many houses they have in thema
-	plot
-		.classed('empty',function(d) { return d==0 })
-		.classed('occupied',function(d) {return d==1 })
-		.classed('crowded',function(d) {return d>1 })
-	;
-
-	plot.exit().remove();
-
-	// create the displays for each house
-	var house = field.select('.houses').selectAll('.house')
-				.data(sorted_houses)
-
-	house.enter()
-		.append('g')
-			.attr('class','house')
-			.append('circle')
-				.attr('r',5);
-	;
-
-	// position each house
-	house
-		.attr('transform',function(d) {
-				return 'translate('+(d*900+20)+',55)';
-		})
-
-	house.exit().remove();
-
-	// show the positions of the placed houses in a list
-	var house_list = d3.select('.house-list ul').selectAll('li')
-						.data(houses);
-
-	house_list.enter()
-				.append('li')
-				.text(function(d){return posformatter(d)});
-	;
-	d3.select('.house-list')
-		.style('display',houses.length ? 'inherit' : 'none')
-	;
-
-	house_list.exit().remove();
-
+	
+	if(enableUI){
+		
+		// create the displays for each plot
+		var plot = field.select('.plots').selectAll('.plot')
+					.data(plots);
+		plot.enter()
+			.append('g')
+			.attr('class','plot')
+			.append('rect')
+		;
+		// size and position all the plots
+		plot
+			.attr('transform',function(d,i) {
+				return "translate("+(((904-plots.length*4)*plotWidth+4)*i+20)+",30)";
+			})
+		;
+		plot.select('rect')
+			.attr('width',function(d,i){return (904-plots.length*4)*plotWidth})
+			.attr('height',50);
+		;
+	
+		// classify plots based on how many houses they have in thema
+		plot
+			.classed('empty',function(d) { return d==0 })
+			.classed('occupied',function(d) {return d==1 })
+			.classed('crowded',function(d) {return d>1 })
+		;
+	
+		plot.exit().remove();
+	
+		// create the displays for each house
+		var house = field.select('.houses').selectAll('.house')
+					.data(sorted_houses)
+	
+		house.enter()
+			.append('g')
+				.attr('class','house')
+				.append('circle')
+					.attr('r',5);
+		;
+	
+		// position each house
+		house
+			.attr('transform',function(d) {
+					return 'translate('+(d*900+20)+',55)';
+			})
+	
+		house.exit().remove();
+	
+		// show the positions of the placed houses in a list
+		var house_list = d3.select('.house-list ul').selectAll('li')
+							.data(houses);
+	
+		house_list.enter()
+					.append('li')
+					.text(function(d){return posformatter(d)});
+		;
+		d3.select('.house-list')
+			.style('display',houses.length ? 'inherit' : 'none')
+		;
+	
+		house_list.exit().remove();
+	}
 }
 
 // add a plot, then recalculate the display
@@ -142,6 +145,8 @@ function addHouse(x) {
 	if(fail) {
 		// if so, remove the house we just added, and move the failed house marker to its position.
 		var last_house_x = houses.pop();
+		
+		if(enableUI)
 		last_house
 			.classed('show',true)
 			.attr('transform','translate('+(last_house_x*900+20)+',55)')
@@ -165,25 +170,30 @@ function addHouse(x) {
 
 // update the page to reflect whether we're in the fail state
 function setFail(fail) {
-	$('#hopeless-warning').hide();
 	failed = fail;
-	$('#fail').toggle(failed);
-	if(failed) {
-		$('#score').text(houses.length);
-		$('#house-pluralise').text(houses.length==1 ? 'house' : 'houses');
-		$('#last-house').text(ordinal(houses.length+1));
-	}
-	else {
-		last_house
-			.classed('show',false)
-		;
+	
+	if(enableUI){
+		$('#hopeless-warning').hide();
+		$('#fail').toggle(failed);
+		if(failed) {
+			$('#score').text(houses.length);
+			$('#house-pluralise').text(houses.length==1 ? 'house' : 'houses');
+			$('#last-house').text(ordinal(houses.length+1));
+		}
+		else {
+			last_house
+				.classed('show',false)
+			;
+		}
 	}
 }
 
 function updateHopelessWarning() {
 	// the situation is hopeless if any plot has more than one house in it
-	var hopeless = d3.max(plots)>1;
-	$('#hopeless-warning').toggle(hopeless);
+	if(enableUI){
+		var hopeless = d3.max(plots)>1;
+		$('#hopeless-warning').toggle(hopeless);
+	}
 }
 
 // when the user clicks on the "see last working solution" button
