@@ -7,7 +7,11 @@ var refreshRate = 0; //times per second (0 will print every frame)
 */
 
 function simulate(){
+	
+	if(running.checked){ running.checked=false; return; }
     
+	reset();
+	
     var timer = new Stopwatch();
     
     var population = new Population();
@@ -26,7 +30,7 @@ function simulate(){
     A.loop = function(){
         
         done = population.evolveGeneration();
-        var x =  f(); //refresh method
+        var x = f(); //refresh method
         
         A.requestInterruptToUpdateDOM = x;
         
@@ -40,10 +44,13 @@ function simulate(){
         elapsed.innerHTML = timer.elapsed();
         
         running.checked = false;
-        enableUI = true;
+        if(noUI.checked) enableUI = true;
+		
+		sequence.value = population.bestMember.code.join("\t");
+		testSequence();
     }
     
-    enableUI = false;
+	if(noUI.checked) enableUI = false;
     
     running.checked = true;
     timer.start();
@@ -58,14 +65,16 @@ var Gene = function(code) {
 };
 Gene.prototype.random = function(length) {
     while (length--) {
-        this.code.push(random(0,1).toFixed(4));
+        this.code.push(random(0,1).toFixed(3));
     }
 };
-Gene.prototype.mutate = function(chance) {
+Gene.prototype.mutate = function(chance, amount) {
     if (Math.random() > chance) return;
     
-    var index = Math.floor(Math.random() * this.code.length);
-    this.code[index] = random(0,1).toFixed(4);
+	//for(var i=0; i<(this.code.length*amount)<<0; i++){
+		var index = Math.floor(Math.random() * this.code.length);
+		this.code[index] = random(0,1).toFixed(3);
+	//}
 };
 
 Gene.prototype.mate = function(gene) {
@@ -92,7 +101,8 @@ var Population = function() {
     this.members = [];
     this.generationNumber = 0;
     
-    this.mutationRate = 0.05;
+    this.mutationChance = 0.05;
+	this.mutationAmount = 0.1;
     
     this.fitnessGoal;
     this.bestMember;
@@ -133,7 +143,7 @@ Population.prototype.evolveGeneration = function() {
     
     for (var i=0; i<this.members.length; i++) {
         
-        this.members[i].mutate(this.mutationRate);
+        this.members[i].mutate(this.mutationChance, this.mutationAmount);
         
         if(this.members[i].fitness>this.bestMember.fitness){ //Best entity
             this.bestMember.fitness = this.members[i].fitness;   //copy best Fitness

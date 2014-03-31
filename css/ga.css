@@ -1,6 +1,13 @@
+body{
+	font-size: 12px;
+}
+
 .ga{
-        font-family: Consolas, Monospace;
-        font-size: 12px;
+	font-family: Consolas, Monospace;
+	font-size: 12px;
+	
+	border: 2px solid black;
+	padding: 10px;
 }
 
 .ga *{
@@ -11,4 +18,12 @@
 
 .ga li{
     white-space: pre;
+}
+
+label{
+	display: inline-block;
+	
+}
+label input{
+	
 }

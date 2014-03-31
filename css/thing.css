@@ -72,3 +72,21 @@ body {
 	font-size: 0.8em;
 	color: #888;
 }
+
+
+
+
+
+.house-list ul li {
+	display: inline;
+	white-space: nowrap;
+	
+	margin-left: 0.5em;
+
+}
+.house-list ul li:before {
+	content: "•";
+	font-size: 20px;
+	margin-right:  0.2em;
+	
+}

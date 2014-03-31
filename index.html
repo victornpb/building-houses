@@ -1,89 +1,108 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<title>Building Houses</title>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Building Houses</title>
 
-		<!-- jquery -->
-		<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<!-- jquery -->
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 
-		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.min.js"></script>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.min.js"></script>
 
-		<script type="text/javascript" src="js/thing.js"></script>
-		<link rel="stylesheet" href="css/normalize.css"></link>
-		<link rel="stylesheet" href="css/thing.css"></link>
+<script type="text/javascript" src="js/thing.js"></script>
+<link rel="stylesheet" href="css/normalize.css"></link>
+<link rel="stylesheet" href="css/thing.css"></link>
+
+<script type="text/javascript" src="js/ga.js"></script>
+<link rel="stylesheet" href="css/ga.css"></link>
+</head>
+<body>
+
+<h1>Building Houses</h1>
+<div class="explanation">
+	<p>Place houses so that each of the equally-sized plots has exactly one house in it. Each time you place a house, the plots get resized so another one can fit in.</p>
+	<p>The graphic below shows you the houses you've placed, as well as the plots that will need to be occupied when you place your <strong>next</strong> house.
+	<p>Click on a plot or write a position in the box to place a house</p>
+</div>
+<form id="text-input">
+	<label>Add a house at position: <input type="number" min="0" max="1" step="0.01"/></label>
+	<button>please</button>
+</form>
+<div>
+<form onSubmit="testSequence(); return false;">
+	<label>Test sequence:
+	<input id="sequence" type="text" size="100" placeholder="0.100, 0.900, 0.400"/></label>
+	<button onclick="testSequence()">Test</button>
+</form>
+</div>
+<div id="field-container">
+	<svg class="field" width="920" height="100"></svg>
+	<button id="undo">Undo</button>
+	<button id="reset">Reset</button>
+</div>
+<div id="hopeless-warning">
+	<p>Oops! No matter where you place your next house, there will be two houses in the same plot.</p>
+	<button id="see-why">Show my last working solution</button>
+</div>
+<div id="fail">
+	<p>You successfully placed <span id="score"></span> <span id="house-pluralise">houses</span>.
+</div>
+
+<div class="house-list">
+	<h3>Placed houses</h3>
+	<ul></ul>
+</div>
+
+
+
+
+<hr>
+
 		
-		<script type="text/javascript" src="js/ga.js"></script>
-		<link rel="stylesheet" href="css/ga.css"></link>
-	</head>
-	<body>
-		<h1>Building Houses</h1>
-		<div class="explanation">
-			<p>Place houses so that each of the equally-sized plots has exactly one house in it. Each time you place a house, the plots get resized so another one can fit in.</p>
-			<p>The graphic below shows you the houses you've placed, as well as the plots that will need to be occupied when you place your <strong>next</strong> house.
-			<p>Click on a plot or write a position in the box to place a house</p>
-		</div>
-		<form id="text-input">
-			<label>Add a house at position: <input type="text"/></label>
-			<button>please</button>
-		</form>
-		<form>
-			<label>Test sequence:
-			<input id="sequence" type="text"/></label>
-			<button>Test</button>
-		</form>
-		<div id="field-container">
-			<svg class="field" width="920" height="100"></svg>
-			<button id="undo">Undo</button>
-			<button id="reset">Reset</button>
-		</div>
-		<div id="hopeless-warning">
-			<p>Oops! No matter where you place your next house, there will be two houses in the same plot.</p>
-			<button id="see-why">Show my last working solution</button>
-		</div>
-		<div id="fail">
-			<p>You successfully placed <span id="score"></span> <span id="house-pluralise">houses</span>.
-		</div>
-
-		<div class="house-list">
-			<h4>Placed houses</h4>
-			<ul></ul>
-		</div>
-
-		<div class="footer">
-			This was made by <a href="http://checkmyworking.com">cp</a>. The idea was <a href="http://singingbanana.com">James Grime's</a>.
-		</div>
-
-		<a href="https://github.com/christianp/building-houses"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+<!-- GA -->
+<div class="ga">
+	<h2>Genetic Algorithm</h2>
+		
+	<div>
+		<label>fitnessGoal: <input id="fitnessGoal" type=number value="11"> houses</label>
+		<label>populationSize: <input id="populationSize" type=number value="20"></label>
+		<label>mutationPercent: <input id="mutationPercent" type=number value="33" >%</label>
+		<label>refreshRate: <input id="refreshRate" type=number min="0" max="60" value="2"> times per second (0 to show every frame)</label>
+		
+		<label><input type="checkbox" id="noUI" checked/> Disable UI while running (much faster)</label>
+		<div><button onClick="simulate()"> Evolve </button> Running: <input type="checkbox" id="running"/></div>
+	</div>
 	
-		<hr>
-		
-		
-		<!-- GA -->
-		<div class="ga">
-				
-			<div>
-			    fitnessGoal: <input id="fitnessGoal" type=number value="11"><br>
-			    populationSize: <input id="populationSize" type=number value="20"><br>
-			    mutationPercent: <input id="mutationPercent" type=number value="33" ><br>
-			    
-			    refreshRate: <input id="refreshRate" type=number min="0" max="60" value="2"> times per second (0 to pring every frame)<br>
-			    <br>
-			    <button onclick="simulate()">Run</button> Running <input type="checkbox" id="running"/><br>
-			</div>
-			
-			<hr>
-			<div>
-			    <p> Elapsed: <span id="elapsed">0</span> ms </p>
-			    <p> Generations/sec: ~<span id="fps">0</span> </p>
-			    <p> Generations: <span id="generations">0</span> </p>
-			    <p> Population: <span id="popSize">0</span> </p>
-			    <br />
-			    <p> Best: <span id="best"></span></p>
-			    <ul id="population"></ul>
-			</div>
-				
-		</div>
-		
-	</body>
+	<hr>
+	<div>
+		<p> Elapsed: <span id="elapsed">0</span> ms </p>
+		<p> Generations/sec: ~<span id="fps">0</span> </p>
+		<p> Generations: <span id="generations">0</span> </p>
+		<p> Population: <span id="popSize">0</span> </p>
+		<br />
+		<p> Best: <span id="best"></span></p>
+		<ul id="population"></ul>
+	</div>
+	<p>Created by Victor B - <a href="http://vitim.us">vitim.us</a></p>
+</div>
+
+<a href="https://github.com/christianp/building-houses"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
+
+
+<div class="footer">
+	This was made by <a href="http://checkmyworking.com">cp</a>. The idea was <a href="http://singingbanana.com">James Grime's</a>.
+</div>
+
+<script type="text/javascript">
+
+function testSequence(){
+		reset();
+		var array = sequence.value.match(/\d*\.\d+|\d+/g);
+		for(var i=0; i<array.length; i++){
+			addHouse(parseFloat(array[i],10));
+		}
+}
+
+</script>
+</body>
 </html>
